@@ -41,6 +41,61 @@ const Index = () => {
       location: 'Main Elevator',
       createdAt: new Date('2024-01-16'),
       assignedTo: 'Sarah Chen'
+    },
+    {
+      id: '2037',
+      title: 'Sewage leaking in basement parking',
+      description: 'There is a strong sewage leak near parking spot B-15. The smell is unbearable and water is pooling.',
+      priority: 'P1',
+      status: 'Open',
+      category: 'Plumbing',
+      location: 'Basement Parking B-15',
+      createdAt: new Date('2024-01-14'),
+      assignedTo: 'Plumbing Team'
+    },
+    {
+      id: '2038',
+      title: 'Broken electrical panel on 7th floor',
+      description: 'The electrical panel cover is hanging loose and some switches are not working properly.',
+      priority: 'P1',
+      status: 'Assigned',
+      category: 'Electrical',
+      location: '7th Floor Corridor',
+      createdAt: new Date('2024-01-13'),
+      assignedTo: 'Electrical Team'
+    },
+    {
+      id: '2039',
+      title: 'Lift stuck between 4th and 5th floor',
+      description: 'The service elevator has been stuck for 30 minutes. Emergency button pressed but no response.',
+      priority: 'P1',
+      status: 'In Progress',
+      category: 'Emergency',
+      location: 'Service Elevator',
+      createdAt: new Date('2024-01-17'),
+      assignedTo: 'Emergency Response'
+    },
+    {
+      id: '2040',
+      title: 'Guard harassment of domestic help',
+      description: 'Security guard at main gate has been asking inappropriate questions and delaying entry for domestic helpers.',
+      priority: 'P2',
+      status: 'Open',
+      category: 'Security',
+      location: 'Main Gate',
+      createdAt: new Date('2024-01-12'),
+      assignedTo: 'Security Manager'
+    },
+    {
+      id: '2041',
+      title: 'Elevator door not closing properly',
+      description: 'The main elevator doors take multiple attempts to close and sometimes open unexpectedly.',
+      priority: 'P2',
+      status: 'Open',
+      category: 'Maintenance',
+      location: 'Main Elevator',
+      createdAt: new Date('2024-01-11'),
+      assignedTo: null
     }
   ]);
 
