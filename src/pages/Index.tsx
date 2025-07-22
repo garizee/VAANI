@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { VoiceInterface } from '@/components/voice/VoiceInterface';
 import { TicketManagement, Ticket } from '@/components/tickets/TicketManagement';
 import { EventRecommendations, CommunityEvent } from '@/components/events/EventRecommendations';
@@ -14,11 +15,24 @@ import {
   BarChart3,
   Building2,
   Users,
-  Mic
+  Mic,
+  LogOut
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
+  const { user, signOut, loading } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // Redirect to auth if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
   const [tickets, setTickets] = useState<Ticket[]>([
     {
       id: '2035',
@@ -123,7 +137,6 @@ const Index = () => {
     }
   ]);
 
-  const { toast } = useToast();
 
   // Mock building facilities (in real app, this would come from building management system)
   const buildingFacilities = ['terrace', 'lounge', 'garden'];
@@ -179,6 +192,37 @@ const Index = () => {
     setFeedbacks(prev => [newFeedback, ...prev]);
   };
 
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to sign out",
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Signed Out",
+        description: "You have been successfully signed out",
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-4 bg-primary rounded-full animate-pulse"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Will redirect to auth
+  }
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
@@ -191,7 +235,7 @@ const Index = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">Community Hub</h1>
-                <p className="text-muted-foreground">Virtual Community Manager</p>
+                <p className="text-muted-foreground">Welcome, {user.email}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -203,6 +247,15 @@ const Index = () => {
                 <Mic className="h-3 w-3" />
                 Voice Ready
               </Badge>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleSignOut}
+                className="flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
             </div>
           </div>
         </div>
