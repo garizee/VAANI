@@ -8,28 +8,29 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 250 100% 98%;
-    --foreground: 224 71% 4%;
+    /* Vaani Community Hub Purple-Green Theme */
+    --background: 280 60% 70%;
+    --foreground: 280 20% 10%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 224 71% 4%;
+    --card: 70 60% 80%;
+    --card-foreground: 280 40% 20%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 224 71% 4%;
 
-    --primary: 220 91% 58%;
-    --primary-foreground: 210 40% 98%;
-    --primary-glow: 220 91% 68%;
+    --primary: 280 70% 60%;
+    --primary-foreground: 70 60% 95%;
+    --primary-glow: 280 70% 70%;
 
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
+    --secondary: 280 40% 80%;
+    --secondary-foreground: 280 40% 20%;
 
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
+    --muted: 280 30% 85%;
+    --muted-foreground: 280 20% 40%;
 
-    --accent: 142 76% 36%;
-    --accent-foreground: 355.7 100% 97.3%;
-    --accent-glow: 142 76% 46%;
+    --accent: 70 60% 75%;
+    --accent-foreground: 280 40% 20%;
+    --accent-glow: 70 60% 85%;
 
     --success: 142 76% 36%;
     --success-foreground: 355.7 100% 97.3%;
@@ -37,12 +38,15 @@ All colors MUST be HSL.
     --warning: 48 96% 53%;
     --warning-foreground: 26 83.3% 14.1%;
 
-    --voice-active: 258 90% 66%;
-    --voice-inactive: 220 8.9% 46.1%;
+    --voice-active: 280 70% 60%;
+    --voice-inactive: 280 20% 50%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-glow)));
-    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+    /* Beautiful gradients for Vaani Community Hub */
+    --gradient-hero: linear-gradient(135deg, hsl(280, 70%, 60%), hsl(280, 70%, 70%));
+    --gradient-accent: linear-gradient(135deg, hsl(70, 60%, 75%), hsl(70, 60%, 85%));
+    --gradient-purple: linear-gradient(135deg, hsl(280, 70%, 60%), hsl(280, 60%, 70%));
+    --gradient-yellow-green: linear-gradient(135deg, hsl(70, 60%, 75%), hsl(70, 60%, 85%));
+    --gradient-subtle: linear-gradient(180deg, hsl(280, 60%, 70%), hsl(280, 50%, 75%));
 
     --shadow-elegant: 0 4px 20px -4px hsl(var(--primary) / 0.15);
     --shadow-voice: 0 0 30px hsl(var(--voice-active) / 0.4);

@@ -1,26 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { VoiceInterface } from '@/components/voice/VoiceInterface';
-import { TicketManagement, Ticket } from '@/components/tickets/TicketManagement';
-import { EventRecommendations, CommunityEvent } from '@/components/events/EventRecommendations';
-import { FeedbackAnalytics, EventFeedback } from '@/components/analytics/FeedbackAnalytics';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { VoiceInterface } from "@/components/voice/VoiceInterface";
+import { TicketManagement } from "@/components/tickets/TicketManagement";
+import { EventRecommendations } from "@/components/events/EventRecommendations";
+import { FeedbackAnalytics } from "@/components/analytics/FeedbackAnalytics";
+import { HallBooking } from "@/components/halls/HallBooking";
+import { CCTVRequest } from "@/components/security/CCTVRequest";
+import { CommunityReminders } from "@/components/reminders/CommunityReminders";
+import { useToast } from "@/hooks/use-toast";
 import { 
-  Home, 
-  Headphones, 
-  Ticket as TicketIcon, 
+  User, 
+  LogOut, 
+  Mic, 
+  Ticket, 
   Calendar, 
-  BarChart3,
-  Building2,
+  BarChart3, 
+  Eye,
   Users,
-  Mic,
-  LogOut
-} from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+  Clock,
+  TrendingUp,
+  CheckCircle,
+  MapPin,
+  Video,
+  Bell
+} from "lucide-react";
 
 const Index = () => {
   const { user, signOut, loading } = useAuth();
@@ -33,88 +41,68 @@ const Index = () => {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
-  const [tickets, setTickets] = useState<Ticket[]>([
+
+  const [tickets, setTickets] = useState([
     {
       id: '2035',
       title: 'Air conditioning not working in apartment 5B',
       description: 'The AC has been making strange noises and not cooling properly for the past two days.',
-      priority: 'P2',
-      status: 'In Progress',
+      priority: 'P2' as const,
+      status: 'In Progress' as const,
       category: 'Maintenance',
       location: 'Apartment 5B',
       createdAt: new Date('2024-01-15'),
       assignedTo: 'Mike Johnson'
     },
     {
-      id: '2036',
-      title: 'Elevator making loud noise',
-      description: 'The main elevator is making grinding sounds when moving between floors 3-5.',
-      priority: 'P1',
-      status: 'Assigned',
+      id: '2034',
+      title: 'Leaky faucet in the community gym',
+      description: 'The faucet in the men\'s restroom of the community gym has been leaking constantly.',
+      priority: 'P3' as const,
+      status: 'Open' as const,
       category: 'Maintenance',
-      location: 'Main Elevator',
-      createdAt: new Date('2024-01-16'),
-      assignedTo: 'Sarah Chen'
-    },
-    {
-      id: '2037',
-      title: 'Sewage leaking in basement parking',
-      description: 'There is a strong sewage leak near parking spot B-15. The smell is unbearable and water is pooling.',
-      priority: 'P1',
-      status: 'Open',
-      category: 'Plumbing',
-      location: 'Basement Parking B-15',
+      location: 'Community Gym',
       createdAt: new Date('2024-01-14'),
-      assignedTo: 'Plumbing Team'
+      assignedTo: null
     },
     {
-      id: '2038',
-      title: 'Broken electrical panel on 7th floor',
-      description: 'The electrical panel cover is hanging loose and some switches are not working properly.',
-      priority: 'P1',
-      status: 'Assigned',
-      category: 'Electrical',
-      location: '7th Floor Corridor',
-      createdAt: new Date('2024-01-13'),
-      assignedTo: 'Electrical Team'
-    },
-    {
-      id: '2039',
-      title: 'Lift stuck between 4th and 5th floor',
-      description: 'The service elevator has been stuck for 30 minutes. Emergency button pressed but no response.',
-      priority: 'P1',
-      status: 'In Progress',
-      category: 'Emergency',
-      location: 'Service Elevator',
-      createdAt: new Date('2024-01-17'),
-      assignedTo: 'Emergency Response'
-    },
-    {
-      id: '2040',
-      title: 'Guard harassment of domestic help',
-      description: 'Security guard at main gate has been asking inappropriate questions and delaying entry for domestic helpers.',
-      priority: 'P2',
-      status: 'Open',
+      id: '2033',
+      title: 'Noise complaint from apartment 12A',
+      description: 'Received a noise complaint from apartment 12A regarding loud music after 10 PM.',
+      priority: 'low',
+      status: 'resolved',
       category: 'Security',
-      location: 'Main Gate',
-      createdAt: new Date('2024-01-12'),
-      assignedTo: 'Security Manager'
+      location: 'Apartment 12A',
+      createdAt: new Date('2024-01-13'),
+      assignedTo: 'Officer Davis',
+      resolvedAt: new Date('2024-01-14')
     },
     {
-      id: '2041',
-      title: 'Elevator door not closing properly',
-      description: 'The main elevator doors take multiple attempts to close and sometimes open unexpectedly.',
-      priority: 'P2',
-      status: 'Open',
+      id: '2032',
+      title: 'Broken glass in the playground area',
+      description: 'There is broken glass near the swings in the playground area, posing a safety hazard.',
+      priority: 'high',
+      status: 'in-progress',
       category: 'Maintenance',
-      location: 'Main Elevator',
+      location: 'Playground Area',
+      createdAt: new Date('2024-01-12'),
+      assignedTo: 'Janitor Smith'
+    },
+    {
+      id: '2031',
+      title: 'Request for additional lighting in the parking lot',
+      description: 'Residents have requested additional lighting in the parking lot due to safety concerns.',
+      priority: 'medium',
+      status: 'open',
+      category: 'Security',
+      location: 'Parking Lot',
       createdAt: new Date('2024-01-11'),
       assignedTo: null
     }
   ]);
 
-  const [selectedEvents, setSelectedEvents] = useState<CommunityEvent[]>([]);
-  const [feedbacks, setFeedbacks] = useState<EventFeedback[]>([
+  const [selectedEvents, setSelectedEvents] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([
     {
       id: 'fb1',
       eventId: 'event-1',
@@ -128,25 +116,52 @@ const Index = () => {
     {
       id: 'fb2',
       eventId: 'event-2',
-      eventTitle: 'Community Game Night',
+      eventTitle: 'Community Movie Night',
       rating: 4,
-      feedback: 'Great fun with neighbors. Could use more variety in board games.',
-      feedbackType: 'voice',
-      category: 'suggestion',
-      submittedAt: new Date('2024-01-12')
+      feedback: 'The movie selection was great, but the sound system could use an upgrade.',
+      feedbackType: 'text',
+      category: 'neutral',
+      submittedAt: new Date('2024-01-09')
+    },
+    {
+      id: 'fb3',
+      eventId: 'event-3',
+      eventTitle: 'Kids Art Workshop',
+      rating: 5,
+      feedback: 'My kids had a blast! The art supplies were high quality and the staff was very friendly.',
+      feedbackType: 'text',
+      category: 'positive',
+      submittedAt: new Date('2024-01-08')
+    },
+    {
+      id: 'fb4',
+      eventId: 'event-1',
+      eventTitle: 'Rooftop Sunset Yoga',
+      rating: 3,
+      feedback: 'It was too crowded and difficult to find a good spot. Maybe limit the number of participants next time?',
+      feedbackType: 'text',
+      category: 'negative',
+      submittedAt: new Date('2024-01-07')
+    },
+    {
+      id: 'fb5',
+      eventId: 'event-2',
+      eventTitle: 'Community Movie Night',
+      rating: 4,
+      feedback: 'Enjoyed the movie and the snacks, but the seating arrangement was a bit uncomfortable.',
+      feedbackType: 'text',
+      category: 'neutral',
+      submittedAt: new Date('2024-01-06')
     }
   ]);
 
+  // Mock building facilities
+  const buildingFacilities = ['Swimming Pool', 'Gym', 'Community Hall', 'Rooftop Garden', 'Kids Play Area', 'Parking'];
 
-  // Mock building facilities (in real app, this would come from building management system)
-  const buildingFacilities = ['terrace', 'lounge', 'garden'];
-
-  const handleVoiceCommand = (command: string, data?: any) => {
-    // Dispatch custom event for components to listen to
+  const handleVoiceCommand = (command, data) => {
     const event = new CustomEvent('voiceCommand', { detail: { command, data } });
     window.dispatchEvent(event);
     
-    // Handle commands at the main level
     if (command === 'suggest_events') {
       toast({
         title: "Event Suggestions",
@@ -160,8 +175,8 @@ const Index = () => {
     }
   };
 
-  const handleCreateTicket = (newTicket: Omit<Ticket, 'id' | 'createdAt'>) => {
-    const ticket: Ticket = {
+  const handleCreateTicket = (newTicket) => {
+    const ticket = {
       ...newTicket,
       id: Date.now().toString().slice(-4),
       createdAt: new Date()
@@ -169,13 +184,13 @@ const Index = () => {
     setTickets(prev => [ticket, ...prev]);
   };
 
-  const handleUpdateTicket = (id: string, updates: Partial<Ticket>) => {
+  const handleUpdateTicket = (id, updates) => {
     setTickets(prev => prev.map(ticket => 
       ticket.id === id ? { ...ticket, ...updates } : ticket
     ));
   };
 
-  const handleSelectEvent = (event: CommunityEvent) => {
+  const handleSelectEvent = (event) => {
     setSelectedEvents(prev => {
       const exists = prev.find(e => e.id === event.id);
       if (exists) return prev;
@@ -183,8 +198,8 @@ const Index = () => {
     });
   };
 
-  const handleSubmitFeedback = (feedback: Omit<EventFeedback, 'id' | 'submittedAt'>) => {
-    const newFeedback: EventFeedback = {
+  const handleSubmitFeedback = (feedback) => {
+    const newFeedback = {
       ...feedback,
       id: Date.now().toString(),
       submittedAt: new Date()
@@ -210,10 +225,10 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-purple flex items-center justify-center">
         <div className="flex items-center gap-2">
           <div className="h-4 w-4 bg-primary rounded-full animate-pulse"></div>
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-primary-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -224,102 +239,196 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-gradient-purple">
       {/* Header */}
-      <div className="border-b bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-6">
+      <header className="bg-accent/20 backdrop-blur-sm border-b border-accent/30">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-gradient-hero rounded-lg flex items-center justify-center">
-                <Building2 className="h-6 w-6 text-white" />
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-yellow-green rounded-full flex items-center justify-center">
+                <div className="text-2xl">🏢</div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold">Community Hub</h1>
-                <p className="text-muted-foreground">Welcome, {user.email}</p>
+                <h1 className="text-2xl font-bold text-primary-foreground">Welcome to Vaani Community Hub</h1>
+                <p className="text-sm text-primary-foreground/80">Speak it up, Fix it Smart</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="flex items-center gap-1">
-                <Users className="h-3 w-3" />
-                235 Residents
-              </Badge>
-              <Badge variant="success" className="flex items-center gap-1">
-                <Mic className="h-3 w-3" />
+            <div className="flex items-center space-x-4">
+              <Button variant="outline" size="sm" className="bg-voice-active/20 border-voice-active text-primary-foreground">
+                <Mic className="h-4 w-4 mr-2" />
                 Voice Ready
+              </Button>
+              <Badge variant="secondary" className="bg-accent/30 text-primary-foreground">
+                <Users className="h-3 w-3 mr-1" />
+                235 residents
               </Badge>
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={handleSignOut}
-                className="flex items-center gap-2"
+                className="bg-secondary/20 border-secondary text-primary-foreground hover:bg-secondary/30"
               >
-                <LogOut className="h-4 w-4" />
-                Sign Out
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign out
               </Button>
+              <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
+                <User className="h-5 w-5 text-muted-foreground" />
+              </div>
             </div>
           </div>
         </div>
+      </header>
+
+      {/* Hero Section */}
+      <div className="text-center py-12 px-4">
+        <h2 className="text-4xl font-bold text-accent-foreground mb-4">
+          Speak it up, Fix it Smart
+        </h2>
+        <p className="text-xl text-primary-foreground/80 max-w-3xl mx-auto">
+          Experience the seamless fulfillment of complex tasks through simple commands
+        </p>
       </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="voice" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="voice" className="flex items-center gap-2">
-              <Headphones className="h-4 w-4" />
-              Voice Assistant
-            </TabsTrigger>
-            <TabsTrigger value="tickets" className="flex items-center gap-2">
-              <TicketIcon className="h-4 w-4" />
-              Support Tickets
-            </TabsTrigger>
-            <TabsTrigger value="events" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Events
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Analytics
-            </TabsTrigger>
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <Home className="h-4 w-4" />
-              Overview
-            </TabsTrigger>
+      {/* Main Content - Feature Cards Grid */}
+      <main className="container mx-auto px-6 pb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+          {/* Voice Assistant Card */}
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="voice"]') as HTMLElement)?.click()}>
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Mic className="h-8 w-8 text-accent-foreground" />
+              </div>
+              <h3 className="text-xl font-bold text-accent-foreground mb-2">Voice Assistant</h3>
+            </CardContent>
+          </Card>
+
+          {/* Support Tickets Card */}
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => document.querySelector('[value="tickets"]')?.click()}>
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Ticket className="h-8 w-8 text-accent-foreground" />
+              </div>
+              <h3 className="text-xl font-bold text-accent-foreground mb-2">Support Tickets</h3>
+            </CardContent>
+          </Card>
+
+          {/* Events Card */}
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => document.querySelector('[value="events"]')?.click()}>
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Calendar className="h-8 w-8 text-accent-foreground" />
+              </div>
+              <h3 className="text-xl font-bold text-accent-foreground mb-2">Events</h3>
+            </CardContent>
+          </Card>
+
+          {/* Analytics Card */}
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => document.querySelector('[value="analytics"]')?.click()}>
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <BarChart3 className="h-8 w-8 text-accent-foreground" />
+              </div>
+              <h3 className="text-xl font-bold text-accent-foreground mb-2">Analytics</h3>
+            </CardContent>
+          </Card>
+
+          {/* Overview Card */}
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => document.querySelector('[value="overview"]')?.click()}>
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Eye className="h-8 w-8 text-accent-foreground" />
+              </div>
+              <h3 className="text-xl font-bold text-accent-foreground mb-2">Overview</h3>
+            </CardContent>
+          </Card>
+
+          {/* Vacant Hall Booking Card */}
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => document.querySelector('[value="halls"]')?.click()}>
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <MapPin className="h-8 w-8 text-accent-foreground" />
+              </div>
+              <h3 className="text-xl font-bold text-accent-foreground mb-2">Vacant Hall Booking</h3>
+            </CardContent>
+          </Card>
+
+          {/* CCTV Footage Card */}
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => document.querySelector('[value="cctv"]')?.click()}>
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Video className="h-8 w-8 text-accent-foreground" />
+              </div>
+              <h3 className="text-xl font-bold text-accent-foreground mb-2">CCTV Footage</h3>
+            </CardContent>
+          </Card>
+
+          {/* Reminders Card */}
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => document.querySelector('[value="reminders"]')?.click()}>
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Bell className="h-8 w-8 text-accent-foreground" />
+              </div>
+              <h3 className="text-xl font-bold text-accent-foreground mb-2">Reminders</h3>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Bottom Action Buttons */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Button className="h-16 text-lg font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl">
+            Share with us if our help reached you
+          </Button>
+          <Button className="h-16 text-lg font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl">
+            Helpline Contacts
+          </Button>
+          <Button className="h-16 text-lg font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl">
+            Your Eco Well Being
+          </Button>
+        </div>
+
+        {/* Hidden Tabs Content for Functionality */}
+        <Tabs defaultValue="overview" className="mt-12">
+          <TabsList className="hidden">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="voice">Voice</TabsTrigger>
+            <TabsTrigger value="tickets">Tickets</TabsTrigger>
+            <TabsTrigger value="events">Events</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="halls">Halls</TabsTrigger>
+            <TabsTrigger value="cctv">CCTV</TabsTrigger>
+            <TabsTrigger value="reminders">Reminders</TabsTrigger>
           </TabsList>
 
-          {/* Voice Interface Tab */}
-          <TabsContent value="voice" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <VoiceInterface 
-                  onCommand={handleVoiceCommand}
-                />
-              </div>
-              <div className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Quick Stats</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-sm">Active Tickets</span>
-                      <Badge variant="warning">{tickets.filter(t => t.status !== 'Resolved').length}</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Recent Feedback</span>
-                      <Badge variant="success">{feedbacks.length}</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Upcoming Events</span>
-                      <Badge variant="default">{selectedEvents.length}</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+          <TabsContent value="halls" className="space-y-6">
+            <HallBooking onBookHall={(hallId) => {
+              toast({
+                title: "Hall booking request submitted",
+                description: "You will receive confirmation within 2 hours",
+              });
+            }} />
           </TabsContent>
 
-          {/* Tickets Tab */}
+          <TabsContent value="cctv" className="space-y-6">
+            <CCTVRequest onSubmitRequest={(request) => {
+              toast({
+                title: "CCTV request submitted",
+                description: "Guard office will process your request",
+              });
+            }} />
+          </TabsContent>
+
+          <TabsContent value="reminders" className="space-y-6">
+            <CommunityReminders onMarkAsRead={(id) => {
+              toast({
+                title: "Reminder marked as read",
+              });
+            }} />
+          </TabsContent>
+
+          <TabsContent value="voice" className="space-y-6">
+            <VoiceInterface onCommand={handleVoiceCommand} />
+          </TabsContent>
+
           <TabsContent value="tickets">
             <TicketManagement
               tickets={tickets}
@@ -328,7 +437,6 @@ const Index = () => {
             />
           </TabsContent>
 
-          {/* Events Tab */}
           <TabsContent value="events">
             <EventRecommendations
               facilities={buildingFacilities}
@@ -337,7 +445,6 @@ const Index = () => {
             />
           </TabsContent>
 
-          {/* Analytics Tab */}
           <TabsContent value="analytics">
             <FeedbackAnalytics
               feedbacks={feedbacks}
@@ -345,111 +452,115 @@ const Index = () => {
             />
           </TabsContent>
 
-          {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Total Residents</p>
-                      <p className="text-2xl font-bold">235</p>
-                    </div>
-                    <Users className="h-8 w-8 text-primary" />
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Summary Cards */}
+              <Card className="bg-gradient-hero text-primary-foreground">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center space-x-2">
+                    <Ticket className="h-5 w-5" />
+                    <span>Active Tickets</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">{tickets.filter(t => t.status !== 'resolved').length}</div>
+                  <p className="text-primary-foreground/80">Open support requests</p>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Open Tickets</p>
-                      <p className="text-2xl font-bold">{tickets.filter(t => t.status !== 'Resolved').length}</p>
-                    </div>
-                    <TicketIcon className="h-8 w-8 text-warning" />
-                  </div>
+              <Card className="bg-gradient-accent text-accent-foreground">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center space-x-2">
+                    <Calendar className="h-5 w-5" />
+                    <span>Upcoming Events</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">{selectedEvents.length}</div>
+                  <p className="text-accent-foreground/80">Selected events</p>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Events This Month</p>
-                      <p className="text-2xl font-bold">4</p>
-                    </div>
-                    <Calendar className="h-8 w-8 text-accent" />
-                  </div>
+              <Card className="bg-card border-2 border-voice-active">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center space-x-2">
+                    <Users className="h-5 w-5" />
+                    <span>Community</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-voice-active">235</div>
+                  <p className="text-muted-foreground">Active residents</p>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Satisfaction</p>
-                      <p className="text-2xl font-bold">4.2★</p>
-                    </div>
-                    <BarChart3 className="h-8 w-8 text-success" />
-                  </div>
+              <Card className="bg-card">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center space-x-2">
+                    <TrendingUp className="h-5 w-5" />
+                    <span>Satisfaction</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-success">94%</div>
+                  <p className="text-muted-foreground">Avg. satisfaction</p>
                 </CardContent>
               </Card>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent Activity</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-start gap-3 p-3 border-l-2 border-success">
-                    <div className="text-sm">
-                      <p className="font-medium">New event: Rooftop Yoga scheduled</p>
-                      <p className="text-muted-foreground">2 hours ago</p>
+            {/* Recent Activity */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Clock className="h-5 w-5" />
+                  <span>Recent Activity</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {tickets.slice(0, 3).map((ticket) => (
+                  <div key={ticket.id} className="flex items-center space-x-4 p-3 bg-muted/50 rounded-lg">
+                    <div className={`w-3 h-3 rounded-full ${
+                      ticket.status === 'resolved' ? 'bg-success' : 
+                      ticket.status === 'in-progress' ? 'bg-warning' : 'bg-destructive'
+                    }`} />
+                    <div className="flex-1">
+                      <p className="font-medium">{ticket.title}</p>
+                      <p className="text-sm text-muted-foreground">{ticket.description}</p>
                     </div>
+                    <Badge variant="outline">{ticket.status}</Badge>
                   </div>
-                  <div className="flex items-start gap-3 p-3 border-l-2 border-warning">
-                    <div className="text-sm">
-                      <p className="font-medium">Ticket #2035 updated to In Progress</p>
-                      <p className="text-muted-foreground">4 hours ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 border-l-2 border-primary">
-                    <div className="text-sm">
-                      <p className="font-medium">5 new feedback responses received</p>
-                      <p className="text-muted-foreground">1 day ago</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                ))}
+              </CardContent>
+            </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>System Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Voice Recognition</span>
-                    <Badge variant="success">Active</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Building Integration</span>
-                    <Badge variant="success">Connected</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Omnidim.io Integration</span>
-                    <Badge variant="warning">Pending Setup</Badge>
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-4 p-3 bg-muted rounded-lg">
-                    <p><strong>Note:</strong> For full Omnidim.io voice AI integration, backend setup is required. Current implementation uses Web Speech API as a fallback.</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            {/* Building Facilities */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <CheckCircle className="h-5 w-5" />
+                  <span>Building Facilities</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {buildingFacilities.map((facility, index) => (
+                    <div key={index} className="text-center p-3 bg-muted/30 rounded-lg">
+                      <div className="text-2xl mb-2">{facility.icon}</div>
+                      <p className="text-sm font-medium">{facility.name}</p>
+                      <Badge 
+                        variant={facility.status === 'available' ? 'default' : 'secondary'}
+                        className="mt-1"
+                      >
+                        {facility.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
-      </div>
+      </main>
     </div>
   );
 };

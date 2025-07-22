@@ -21,6 +21,8 @@ export default {
 			backgroundImage: {
 				'gradient-hero': 'var(--gradient-hero)',
 				'gradient-accent': 'var(--gradient-accent)',
+				'gradient-purple': 'var(--gradient-purple)',
+				'gradient-yellow-green': 'var(--gradient-yellow-green)',
 				'gradient-subtle': 'var(--gradient-subtle)',
 			},
 			boxShadow: {
