@@ -69,8 +69,8 @@ const Index = () => {
       id: '2033',
       title: 'Noise complaint from apartment 12A',
       description: 'Received a noise complaint from apartment 12A regarding loud music after 10 PM.',
-      priority: 'low',
-      status: 'resolved',
+      priority: 'P3' as const,
+      status: 'Resolved' as const,
       category: 'Security',
       location: 'Apartment 12A',
       createdAt: new Date('2024-01-13'),
@@ -81,8 +81,8 @@ const Index = () => {
       id: '2032',
       title: 'Broken glass in the playground area',
       description: 'There is broken glass near the swings in the playground area, posing a safety hazard.',
-      priority: 'high',
-      status: 'in-progress',
+      priority: 'P1' as const,
+      status: 'In Progress' as const,
       category: 'Maintenance',
       location: 'Playground Area',
       createdAt: new Date('2024-01-12'),
@@ -92,8 +92,8 @@ const Index = () => {
       id: '2031',
       title: 'Request for additional lighting in the parking lot',
       description: 'Residents have requested additional lighting in the parking lot due to safety concerns.',
-      priority: 'medium',
-      status: 'open',
+      priority: 'P2' as const,
+      status: 'Open' as const,
       category: 'Security',
       location: 'Parking Lot',
       createdAt: new Date('2024-01-11'),
@@ -107,56 +107,63 @@ const Index = () => {
       id: 'fb1',
       eventId: 'event-1',
       eventTitle: 'Rooftop Sunset Yoga',
-      rating: 5,
+      rating: 5 as const,
       feedback: 'Amazing experience! The sunset views were breathtaking and the instructor was wonderful.',
-      feedbackType: 'text',
-      category: 'positive',
+      feedbackType: 'text' as const,
+      category: 'positive' as const,
       submittedAt: new Date('2024-01-10')
     },
     {
       id: 'fb2',
       eventId: 'event-2',
       eventTitle: 'Community Movie Night',
-      rating: 4,
+      rating: 4 as const,
       feedback: 'The movie selection was great, but the sound system could use an upgrade.',
-      feedbackType: 'text',
-      category: 'neutral',
+      feedbackType: 'text' as const,
+      category: 'neutral' as const,
       submittedAt: new Date('2024-01-09')
     },
     {
       id: 'fb3',
       eventId: 'event-3',
       eventTitle: 'Kids Art Workshop',
-      rating: 5,
+      rating: 5 as const,
       feedback: 'My kids had a blast! The art supplies were high quality and the staff was very friendly.',
-      feedbackType: 'text',
-      category: 'positive',
+      feedbackType: 'text' as const,
+      category: 'positive' as const,
       submittedAt: new Date('2024-01-08')
     },
     {
       id: 'fb4',
       eventId: 'event-1',
       eventTitle: 'Rooftop Sunset Yoga',
-      rating: 3,
+      rating: 3 as const,
       feedback: 'It was too crowded and difficult to find a good spot. Maybe limit the number of participants next time?',
-      feedbackType: 'text',
-      category: 'negative',
+      feedbackType: 'text' as const,
+      category: 'negative' as const,
       submittedAt: new Date('2024-01-07')
     },
     {
       id: 'fb5',
       eventId: 'event-2',
       eventTitle: 'Community Movie Night',
-      rating: 4,
+      rating: 4 as const,
       feedback: 'Enjoyed the movie and the snacks, but the seating arrangement was a bit uncomfortable.',
-      feedbackType: 'text',
-      category: 'neutral',
+      feedbackType: 'text' as const,
+      category: 'neutral' as const,
       submittedAt: new Date('2024-01-06')
     }
   ]);
 
   // Mock building facilities
-  const buildingFacilities = ['Swimming Pool', 'Gym', 'Community Hall', 'Rooftop Garden', 'Kids Play Area', 'Parking'];
+  const buildingFacilities = [
+    { name: 'Swimming Pool', icon: '🏊', status: 'available' },
+    { name: 'Gym', icon: '💪', status: 'available' }, 
+    { name: 'Community Hall', icon: '🏛️', status: 'occupied' },
+    { name: 'Rooftop Garden', icon: '🌱', status: 'available' },
+    { name: 'Kids Play Area', icon: '🎮', status: 'available' },
+    { name: 'Parking', icon: '🚗', status: 'available' }
+  ];
 
   const handleVoiceCommand = (command, data) => {
     const event = new CustomEvent('voiceCommand', { detail: { command, data } });
@@ -293,7 +300,7 @@ const Index = () => {
       <main className="container mx-auto px-6 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
           {/* Voice Assistant Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="voice"]') as HTMLElement)?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="voice"]') as HTMLButtonElement)?.click()}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Mic className="h-8 w-8 text-accent-foreground" />
@@ -303,7 +310,7 @@ const Index = () => {
           </Card>
 
           {/* Support Tickets Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => document.querySelector('[value="tickets"]')?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="tickets"]') as HTMLButtonElement)?.click()}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Ticket className="h-8 w-8 text-accent-foreground" />
@@ -313,7 +320,7 @@ const Index = () => {
           </Card>
 
           {/* Events Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => document.querySelector('[value="events"]')?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="events"]') as HTMLButtonElement)?.click()}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Calendar className="h-8 w-8 text-accent-foreground" />
@@ -323,7 +330,7 @@ const Index = () => {
           </Card>
 
           {/* Analytics Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => document.querySelector('[value="analytics"]')?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="analytics"]') as HTMLButtonElement)?.click()}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <BarChart3 className="h-8 w-8 text-accent-foreground" />
@@ -333,7 +340,7 @@ const Index = () => {
           </Card>
 
           {/* Overview Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => document.querySelector('[value="overview"]')?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="overview"]') as HTMLButtonElement)?.click()}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Eye className="h-8 w-8 text-accent-foreground" />
@@ -343,7 +350,7 @@ const Index = () => {
           </Card>
 
           {/* Vacant Hall Booking Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => document.querySelector('[value="halls"]')?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="halls"]') as HTMLButtonElement)?.click()}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <MapPin className="h-8 w-8 text-accent-foreground" />
@@ -353,7 +360,7 @@ const Index = () => {
           </Card>
 
           {/* CCTV Footage Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => document.querySelector('[value="cctv"]')?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="cctv"]') as HTMLButtonElement)?.click()}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Video className="h-8 w-8 text-accent-foreground" />
@@ -363,7 +370,7 @@ const Index = () => {
           </Card>
 
           {/* Reminders Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => document.querySelector('[value="reminders"]')?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="reminders"]') as HTMLButtonElement)?.click()}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Bell className="h-8 w-8 text-accent-foreground" />
@@ -439,7 +446,7 @@ const Index = () => {
 
           <TabsContent value="events">
             <EventRecommendations
-              facilities={buildingFacilities}
+              facilities={buildingFacilities.map(f => f.name)}
               pastEvents={[]}
               onSelectEvent={handleSelectEvent}
             />
@@ -463,7 +470,7 @@ const Index = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">{tickets.filter(t => t.status !== 'resolved').length}</div>
+                  <div className="text-3xl font-bold">{tickets.filter(t => t.status !== 'Resolved').length}</div>
                   <p className="text-primary-foreground/80">Open support requests</p>
                 </CardContent>
               </Card>
@@ -520,8 +527,8 @@ const Index = () => {
                 {tickets.slice(0, 3).map((ticket) => (
                   <div key={ticket.id} className="flex items-center space-x-4 p-3 bg-muted/50 rounded-lg">
                     <div className={`w-3 h-3 rounded-full ${
-                      ticket.status === 'resolved' ? 'bg-success' : 
-                      ticket.status === 'in-progress' ? 'bg-warning' : 'bg-destructive'
+                      ticket.status === 'Resolved' ? 'bg-success' : 
+                      ticket.status === 'In Progress' ? 'bg-warning' : 'bg-destructive'
                     }`} />
                     <div className="flex-1">
                       <p className="font-medium">{ticket.title}</p>
