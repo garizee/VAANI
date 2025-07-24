@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { VoiceInterface } from "@/components/voice/VoiceInterface";
 import { TicketManagement } from "@/components/tickets/TicketManagement";
 import { EventRecommendations } from "@/components/events/EventRecommendations";
@@ -27,13 +27,15 @@ import {
   CheckCircle,
   MapPin,
   Video,
-  Bell
+  Bell,
+  X
 } from "lucide-react";
 
 const Index = () => {
   const { user, signOut, loading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [activePanel, setActivePanel] = useState(null);
 
   // Redirect to auth if not authenticated
   useEffect(() => {
@@ -300,7 +302,7 @@ const Index = () => {
       <main className="container mx-auto px-6 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
           {/* Voice Assistant Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="voice"]') as HTMLButtonElement)?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => setActivePanel('voice')}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Mic className="h-8 w-8 text-accent-foreground" />
@@ -310,7 +312,7 @@ const Index = () => {
           </Card>
 
           {/* Support Tickets Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="tickets"]') as HTMLButtonElement)?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => setActivePanel('tickets')}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Ticket className="h-8 w-8 text-accent-foreground" />
@@ -320,7 +322,7 @@ const Index = () => {
           </Card>
 
           {/* Events Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="events"]') as HTMLButtonElement)?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => setActivePanel('events')}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Calendar className="h-8 w-8 text-accent-foreground" />
@@ -330,7 +332,7 @@ const Index = () => {
           </Card>
 
           {/* Analytics Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="analytics"]') as HTMLButtonElement)?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => setActivePanel('analytics')}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <BarChart3 className="h-8 w-8 text-accent-foreground" />
@@ -340,7 +342,7 @@ const Index = () => {
           </Card>
 
           {/* Overview Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="overview"]') as HTMLButtonElement)?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => setActivePanel('overview')}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Eye className="h-8 w-8 text-accent-foreground" />
@@ -350,7 +352,7 @@ const Index = () => {
           </Card>
 
           {/* Vacant Hall Booking Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="halls"]') as HTMLButtonElement)?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => setActivePanel('halls')}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <MapPin className="h-8 w-8 text-accent-foreground" />
@@ -360,7 +362,7 @@ const Index = () => {
           </Card>
 
           {/* CCTV Footage Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="cctv"]') as HTMLButtonElement)?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => setActivePanel('cctv')}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Video className="h-8 w-8 text-accent-foreground" />
@@ -370,7 +372,7 @@ const Index = () => {
           </Card>
 
           {/* Reminders Card */}
-          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => (document.querySelector('[value="reminders"]') as HTMLButtonElement)?.click()}>
+          <Card className="bg-gradient-yellow-green border-accent hover:shadow-xl transition-all cursor-pointer group" onClick={() => setActivePanel('reminders')}>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-accent-foreground/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Bell className="h-8 w-8 text-accent-foreground" />
@@ -393,180 +395,197 @@ const Index = () => {
           </Button>
         </div>
 
-        {/* Hidden Tabs Content for Functionality */}
-        <Tabs defaultValue="overview" className="mt-12">
-          <TabsList className="hidden">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="voice">Voice</TabsTrigger>
-            <TabsTrigger value="tickets">Tickets</TabsTrigger>
-            <TabsTrigger value="events">Events</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="halls">Halls</TabsTrigger>
-            <TabsTrigger value="cctv">CCTV</TabsTrigger>
-            <TabsTrigger value="reminders">Reminders</TabsTrigger>
-          </TabsList>
+        {/* Modal Panels */}
+        <Dialog open={!!activePanel} onOpenChange={() => setActivePanel(null)}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-gradient-yellow-green border-accent">
+            <DialogHeader>
+              <DialogTitle className="text-accent-foreground flex items-center gap-2">
+                {activePanel === 'voice' && <><Mic className="h-5 w-5" /> Voice Assistant</>}
+                {activePanel === 'tickets' && <><Ticket className="h-5 w-5" /> Support Tickets</>}
+                {activePanel === 'events' && <><Calendar className="h-5 w-5" /> Events</>}
+                {activePanel === 'analytics' && <><BarChart3 className="h-5 w-5" /> Analytics</>}
+                {activePanel === 'overview' && <><Eye className="h-5 w-5" /> Overview</>}
+                {activePanel === 'halls' && <><MapPin className="h-5 w-5" /> Hall Booking</>}
+                {activePanel === 'cctv' && <><Video className="h-5 w-5" /> CCTV Footage</>}
+                {activePanel === 'reminders' && <><Bell className="h-5 w-5" /> Reminders</>}
+              </DialogTitle>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="absolute right-4 top-4 text-accent-foreground hover:bg-accent-foreground/20"
+                onClick={() => setActivePanel(null)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </DialogHeader>
+            
+            <div className="mt-6">
+              {activePanel === 'voice' && (
+                <VoiceInterface onCommand={handleVoiceCommand} />
+              )}
+              
+              {activePanel === 'tickets' && (
+                <TicketManagement 
+                  tickets={tickets} 
+                  onCreateTicket={handleCreateTicket}
+                  onUpdateTicket={handleUpdateTicket}
+                />
+              )}
+              
+              {activePanel === 'events' && (
+                <EventRecommendations 
+                  facilities={buildingFacilities.map(f => f.name)}
+                  pastEvents={[]}
+                  onSelectEvent={handleSelectEvent}
+                />
+              )}
+              
+              {activePanel === 'analytics' && (
+                <FeedbackAnalytics 
+                  feedbacks={feedbacks}
+                  onSubmitFeedback={handleSubmitFeedback}
+                />
+              )}
+              
+              {activePanel === 'halls' && (
+                <HallBooking onBookHall={(hallId) => {
+                  toast({
+                    title: "Hall booking request submitted",
+                    description: "You will receive confirmation within 2 hours",
+                  });
+                }} />
+              )}
+              
+              {activePanel === 'cctv' && (
+                <CCTVRequest onSubmitRequest={(request) => {
+                  toast({
+                    title: "CCTV request submitted",
+                    description: "Request ID: " + Date.now().toString().slice(-6),
+                  });
+                }} />
+              )}
+              
+              {activePanel === 'reminders' && (
+                <CommunityReminders />
+              )}
+              
+              {activePanel === 'overview' && (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <Card className="bg-accent-foreground/10 border-accent-foreground/20">
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium text-accent-foreground">Active Tickets</CardTitle>
+                        <Ticket className="h-4 w-4 text-accent-foreground" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold text-accent-foreground">{tickets.filter(t => t.status !== 'Resolved').length}</div>
+                        <p className="text-xs text-accent-foreground/70">
+                          {tickets.filter(t => t.priority === 'P1').length} high priority
+                        </p>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="bg-accent-foreground/10 border-accent-foreground/20">
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium text-accent-foreground">Upcoming Events</CardTitle>
+                        <Calendar className="h-4 w-4 text-accent-foreground" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold text-accent-foreground">8</div>
+                        <p className="text-xs text-accent-foreground/70">
+                          3 this week
+                        </p>
+                      </CardContent>
+                    </Card>
 
-          <TabsContent value="halls" className="space-y-6">
-            <HallBooking onBookHall={(hallId) => {
-              toast({
-                title: "Hall booking request submitted",
-                description: "You will receive confirmation within 2 hours",
-              });
-            }} />
-          </TabsContent>
+                    <Card className="bg-accent-foreground/10 border-accent-foreground/20">
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium text-accent-foreground">Community Activity</CardTitle>
+                        <TrendingUp className="h-4 w-4 text-accent-foreground" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold text-accent-foreground">92%</div>
+                        <p className="text-xs text-accent-foreground/70">
+                          +2.1% from last week
+                        </p>
+                      </CardContent>
+                    </Card>
 
-          <TabsContent value="cctv" className="space-y-6">
-            <CCTVRequest onSubmitRequest={(request) => {
-              toast({
-                title: "CCTV request submitted",
-                description: "Guard office will process your request",
-              });
-            }} />
-          </TabsContent>
-
-          <TabsContent value="reminders" className="space-y-6">
-            <CommunityReminders onMarkAsRead={(id) => {
-              toast({
-                title: "Reminder marked as read",
-              });
-            }} />
-          </TabsContent>
-
-          <TabsContent value="voice" className="space-y-6">
-            <VoiceInterface onCommand={handleVoiceCommand} />
-          </TabsContent>
-
-          <TabsContent value="tickets">
-            <TicketManagement
-              tickets={tickets}
-              onCreateTicket={handleCreateTicket}
-              onUpdateTicket={handleUpdateTicket}
-            />
-          </TabsContent>
-
-          <TabsContent value="events">
-            <EventRecommendations
-              facilities={buildingFacilities.map(f => f.name)}
-              pastEvents={[]}
-              onSelectEvent={handleSelectEvent}
-            />
-          </TabsContent>
-
-          <TabsContent value="analytics">
-            <FeedbackAnalytics
-              feedbacks={feedbacks}
-              onSubmitFeedback={handleSubmitFeedback}
-            />
-          </TabsContent>
-
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Summary Cards */}
-              <Card className="bg-gradient-hero text-primary-foreground">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center space-x-2">
-                    <Ticket className="h-5 w-5" />
-                    <span>Active Tickets</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">{tickets.filter(t => t.status !== 'Resolved').length}</div>
-                  <p className="text-primary-foreground/80">Open support requests</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-accent text-accent-foreground">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center space-x-2">
-                    <Calendar className="h-5 w-5" />
-                    <span>Upcoming Events</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">{selectedEvents.length}</div>
-                  <p className="text-accent-foreground/80">Selected events</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-card border-2 border-voice-active">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center space-x-2">
-                    <Users className="h-5 w-5" />
-                    <span>Community</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-voice-active">235</div>
-                  <p className="text-muted-foreground">Active residents</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-card">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center space-x-2">
-                    <TrendingUp className="h-5 w-5" />
-                    <span>Satisfaction</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-success">94%</div>
-                  <p className="text-muted-foreground">Avg. satisfaction</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Recent Activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Clock className="h-5 w-5" />
-                  <span>Recent Activity</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {tickets.slice(0, 3).map((ticket) => (
-                  <div key={ticket.id} className="flex items-center space-x-4 p-3 bg-muted/50 rounded-lg">
-                    <div className={`w-3 h-3 rounded-full ${
-                      ticket.status === 'Resolved' ? 'bg-success' : 
-                      ticket.status === 'In Progress' ? 'bg-warning' : 'bg-destructive'
-                    }`} />
-                    <div className="flex-1">
-                      <p className="font-medium">{ticket.title}</p>
-                      <p className="text-sm text-muted-foreground">{ticket.description}</p>
-                    </div>
-                    <Badge variant="outline">{ticket.status}</Badge>
+                    <Card className="bg-accent-foreground/10 border-accent-foreground/20">
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium text-accent-foreground">Satisfaction</CardTitle>
+                        <CheckCircle className="h-4 w-4 text-accent-foreground" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold text-accent-foreground">4.8</div>
+                        <p className="text-xs text-accent-foreground/70">
+                          Average rating
+                        </p>
+                      </CardContent>
+                    </Card>
                   </div>
-                ))}
-              </CardContent>
-            </Card>
 
-            {/* Building Facilities */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <CheckCircle className="h-5 w-5" />
-                  <span>Building Facilities</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {buildingFacilities.map((facility, index) => (
-                    <div key={index} className="text-center p-3 bg-muted/30 rounded-lg">
-                      <div className="text-2xl mb-2">{facility.icon}</div>
-                      <p className="text-sm font-medium">{facility.name}</p>
-                      <Badge 
-                        variant={facility.status === 'available' ? 'default' : 'secondary'}
-                        className="mt-1"
-                      >
-                        {facility.status}
-                      </Badge>
-                    </div>
-                  ))}
+                  {/* Recent Activity */}
+                  <Card className="bg-accent-foreground/10 border-accent-foreground/20">
+                    <CardHeader>
+                      <CardTitle className="text-accent-foreground">Recent Activity</CardTitle>
+                      <CardDescription className="text-accent-foreground/70">Latest updates in your community</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-2 h-2 bg-voice-active rounded-full" />
+                        <div className="flex-1">
+                          <p className="text-sm text-accent-foreground">New ticket #2035 created - AC maintenance</p>
+                          <p className="text-xs text-accent-foreground/70">2 hours ago</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                        <div className="flex-1">
+                          <p className="text-sm text-accent-foreground">Ticket #2033 resolved - Noise complaint</p>
+                          <p className="text-xs text-accent-foreground/70">1 day ago</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                        <div className="flex-1">
+                          <p className="text-sm text-accent-foreground">Community yoga event scheduled</p>
+                          <p className="text-xs text-accent-foreground/70">2 days ago</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Building Facilities */}
+                  <Card className="bg-accent-foreground/10 border-accent-foreground/20">
+                    <CardHeader>
+                      <CardTitle className="text-accent-foreground">Building Facilities</CardTitle>
+                      <CardDescription className="text-accent-foreground/70">Current status of community amenities</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {buildingFacilities.map((facility, index) => (
+                          <div key={index} className="flex items-center space-x-3 p-3 bg-accent-foreground/5 rounded-lg">
+                            <span className="text-2xl">{facility.icon}</span>
+                            <div>
+                              <p className="text-sm font-medium text-accent-foreground">{facility.name}</p>
+                              <Badge 
+                                variant={facility.status === 'available' ? 'secondary' : 'outline'}
+                                className="text-xs"
+                              >
+                                {facility.status}
+                              </Badge>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
