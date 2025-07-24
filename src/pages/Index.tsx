@@ -397,7 +397,7 @@ const Index = () => {
 
         {/* Modal Panels */}
         <Dialog open={!!activePanel} onOpenChange={() => setActivePanel(null)}>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-gradient-yellow-green border-accent">
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-gradient-yellow-green border-accent" aria-describedby="panel-description">
             <DialogHeader>
               <DialogTitle className="text-accent-foreground flex items-center gap-2">
                 {activePanel === 'voice' && <><Mic className="h-5 w-5" /> Voice Assistant</>}
@@ -409,6 +409,16 @@ const Index = () => {
                 {activePanel === 'cctv' && <><Video className="h-5 w-5" /> CCTV Footage</>}
                 {activePanel === 'reminders' && <><Bell className="h-5 w-5" /> Reminders</>}
               </DialogTitle>
+              <div id="panel-description" className="sr-only">
+                {activePanel === 'voice' && 'Voice assistant interface for hands-free commands'}
+                {activePanel === 'tickets' && 'Support ticket management system'}
+                {activePanel === 'events' && 'Event recommendations and management'}
+                {activePanel === 'analytics' && 'Community feedback and analytics dashboard'}
+                {activePanel === 'overview' && 'Overview of community statistics and activities'}
+                {activePanel === 'halls' && 'Hall booking and reservation system'}
+                {activePanel === 'cctv' && 'CCTV footage request system'}
+                {activePanel === 'reminders' && 'Community reminders and notifications'}
+              </div>
               <Button 
                 variant="ghost" 
                 size="icon"
@@ -434,7 +444,7 @@ const Index = () => {
               
               {activePanel === 'events' && (
                 <EventRecommendations 
-                  facilities={buildingFacilities.map(f => f.name)}
+                  facilities={buildingFacilities?.map(f => f?.name).filter(Boolean) || []}
                   pastEvents={[]}
                   onSelectEvent={handleSelectEvent}
                 />
