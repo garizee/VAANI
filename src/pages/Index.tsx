@@ -39,6 +39,7 @@ const Index = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState('overview');
+  const [isVoiceActive, setIsVoiceActive] = useState(false);
 
   // Redirect to auth if not authenticated
   useEffect(() => {
@@ -174,17 +175,36 @@ const Index = () => {
     const event = new CustomEvent('voiceCommand', { detail: { command, data } });
     window.dispatchEvent(event);
     
+    setIsVoiceActive(true);
+    
     if (command === 'suggest_events') {
       toast({
         title: "Event Suggestions",
         description: "Check the Events tab for personalized recommendations!",
       });
+      setCurrentView('events');
     } else if (command === 'collect_feedback') {
       toast({
         title: "Feedback Collected",
         description: "Your feedback has been recorded. Thank you!",
       });
+      setCurrentView('analytics');
+    } else if (command === 'create_complaint') {
+      toast({
+        title: "Creating Support Ticket",
+        description: "Opening ticket management for you...",
+      });
+      setCurrentView('tickets');
+    } else if (command === 'check_ticket_status') {
+      toast({
+        title: "Checking Ticket Status",
+        description: `Looking up ticket #${data?.ticketId || 'Unknown'}`,
+      });
+      setCurrentView('tickets');
     }
+    
+    // Auto-disable voice after command
+    setTimeout(() => setIsVoiceActive(false), 3000);
   };
 
   const handleCreateTicket = (newTicket) => {
@@ -382,10 +402,23 @@ const Index = () => {
                 <Users className="h-3 w-3 mr-1" />
                 235 residents
               </Badge>
-              <Badge variant="outline" className="bg-voice-active/20 border-voice-active text-voice-active">
+              <Button 
+                variant={isVoiceActive ? "default" : "outline"} 
+                size="sm"
+                onClick={() => {
+                  setIsVoiceActive(!isVoiceActive);
+                  if (!isVoiceActive) {
+                    setCurrentView('voice');
+                  }
+                }}
+                className={`${isVoiceActive 
+                  ? 'bg-voice-active text-voice-active-foreground shadow-voice animate-pulse' 
+                  : 'bg-voice-inactive/20 border-voice-inactive text-voice-inactive hover:bg-voice-active/30'
+                } transition-all duration-300`}
+              >
                 <Mic className="h-3 w-3 mr-1" />
-                Voice Ready
-              </Badge>
+                {isVoiceActive ? 'Voice Active' : 'Voice Ready'}
+              </Button>
             </div>
           </div>
         </header>
@@ -403,7 +436,12 @@ const Index = () => {
       case 'voice':
         return (
           <div className="bg-background/80 backdrop-blur-sm rounded-lg p-6">
-            <VoiceInterface onCommand={handleVoiceCommand} />
+            <VoiceInterface 
+              onCommand={handleVoiceCommand}
+              onTranscript={(transcript) => {
+                console.log('Voice transcript:', transcript);
+              }}
+            />
           </div>
         );
       case 'tickets':
