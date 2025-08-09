@@ -12,6 +12,7 @@ import { HallBooking } from "@/components/halls/HallBooking";
 import { CCTVRequest } from "@/components/security/CCTVRequest";
 import { CommunityReminders } from "@/components/reminders/CommunityReminders";
 import { useToast } from "@/hooks/use-toast";
+import vaaniLogo from "@/assets/vaani-logo.png";
 import { 
   User, 
   LogOut, 
@@ -277,12 +278,11 @@ const Index = () => {
         {/* Logo Section */}
         <div className="p-6 border-b border-accent/30">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-yellow-green rounded-lg flex items-center justify-center">
-              <div className="text-xl">🏢</div>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+              <img src={vaaniLogo} alt="Vaani Logo" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-primary-foreground">Welcome!</h1>
-              <p className="text-sm text-primary-foreground/60">Vaani</p>
+              <h1 className="text-lg font-bold text-primary-foreground">VAANI</h1>
             </div>
           </div>
         </div>
