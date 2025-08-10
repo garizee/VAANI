@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertCircle, Clock, CheckCircle, User, MapPin, Wrench } from 'lucide-react';
+import { AlertCircle, Clock, CheckCircle, User, MapPin, Wrench, Camera, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface Ticket {
   id: string;
@@ -20,6 +22,7 @@ export interface Ticket {
   createdAt: Date;
   assignedTo?: string;
   estimatedResolution?: Date;
+  image_url?: string;
 }
 
 interface TicketManagementProps {
@@ -35,7 +38,11 @@ export const TicketManagement: React.FC<TicketManagementProps> = ({
 }) => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [searchTicket, setSearchTicket] = useState('');
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const [newTicket, setNewTicket] = useState({
     title: '',
@@ -44,7 +51,8 @@ export const TicketManagement: React.FC<TicketManagementProps> = ({
     status: 'Open' as 'Open' | 'Assigned' | 'In Progress' | 'Resolved',
     category: '',
     location: '',
-    assignedTo: ''
+    assignedTo: '',
+    image_url: ''
   });
 
   const priorityConfig = {
@@ -61,7 +69,56 @@ export const TicketManagement: React.FC<TicketManagementProps> = ({
     Resolved: { label: 'Resolved', color: 'success', icon: CheckCircle }
   } as const;
 
-  const handleCreateTicket = (e: React.FormEvent) => {
+  const uploadTicketImage = async (file: File, ticketId: string) => {
+    if (!user) return null;
+
+    try {
+      setUploading(true);
+      
+      // Upload image to Supabase Storage bucket
+      const { data, error } = await supabase.storage
+        .from('ticket-images')
+        .upload(`images/${ticketId}/${file.name}`, file);
+
+      if (error) {
+        console.error('Image upload error:', error);
+        toast({
+          title: "Upload Failed",
+          description: "Failed to upload image. Please try again.",
+          variant: "destructive",
+        });
+        return null;
+      }
+
+      // Get public URL for the uploaded image
+      const imageUrl = supabase.storage.from('ticket-images').getPublicUrl(data.path).data.publicUrl;
+      
+      return imageUrl;
+    } catch (error) {
+      console.error('Upload error:', error);
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onload = (e) => setImagePreview(e.target?.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    setNewTicket({ ...newTicket, image_url: '' });
+  };
+
+  const handleCreateTicket = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!newTicket.title || !newTicket.description) {
@@ -71,6 +128,12 @@ export const TicketManagement: React.FC<TicketManagementProps> = ({
         variant: "destructive",
       });
       return;
+    }
+
+    let imageUrl = '';
+    if (selectedImage) {
+      const tempTicketId = Date.now().toString();
+      imageUrl = await uploadTicketImage(selectedImage, tempTicketId) || '';
     }
 
     // Auto-assign priority based on keywords
@@ -85,7 +148,7 @@ export const TicketManagement: React.FC<TicketManagementProps> = ({
       priority = 'P2';
     }
 
-    onCreateTicket({ ...newTicket, priority });
+    onCreateTicket({ ...newTicket, priority, image_url: imageUrl });
     
     toast({
       title: "Ticket Created",
@@ -99,8 +162,10 @@ export const TicketManagement: React.FC<TicketManagementProps> = ({
       status: 'Open',
       category: '',
       location: '',
-      assignedTo: ''
+      assignedTo: '',
+      image_url: ''
     });
+    removeImage();
     setShowCreateForm(false);
   };
 
@@ -286,8 +351,51 @@ export const TicketManagement: React.FC<TicketManagementProps> = ({
                 />
               </div>
 
+              <div>
+                <Label>Attach Image (Optional)</Label>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      className="hidden"
+                      id="image-upload"
+                    />
+                    <Label 
+                      htmlFor="image-upload" 
+                      className="flex items-center gap-2 cursor-pointer bg-secondary hover:bg-secondary/80 px-3 py-2 rounded-md text-sm"
+                    >
+                      <Camera className="h-4 w-4" />
+                      {selectedImage ? 'Change Image' : 'Add Image'}
+                    </Label>
+                    {selectedImage && (
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={removeImage}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                  {imagePreview && (
+                    <div className="mt-2">
+                      <img 
+                        src={imagePreview} 
+                        alt="Preview" 
+                        className="max-w-xs h-32 object-cover rounded-md border"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="flex gap-2">
-                <Button type="submit">Create Ticket</Button>
+                <Button type="submit" disabled={uploading}>
+                  {uploading ? 'Creating...' : 'Create Ticket'}
+                </Button>
                 <Button type="button" variant="outline" onClick={() => setShowCreateForm(false)}>
                   Cancel
                 </Button>
@@ -329,6 +437,15 @@ export const TicketManagement: React.FC<TicketManagementProps> = ({
                       </div>
                       <p className="font-medium">{ticket.title}</p>
                       <p className="text-sm text-muted-foreground">{ticket.description}</p>
+                      {ticket.image_url && (
+                        <div className="mt-2">
+                          <img 
+                            src={ticket.image_url} 
+                            alt="Ticket attachment" 
+                            className="max-w-xs h-24 object-cover rounded-md border"
+                          />
+                        </div>
+                      )}
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <MapPin className="h-3 w-3" />
