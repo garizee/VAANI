@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Mic, MicOff, Loader2, Volume2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface VoiceInterfaceProps {
   onTranscript?: (transcript: string) => void;
@@ -17,72 +18,79 @@ export const VoiceInterface: React.FC<VoiceInterfaceProps> = ({
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [recognitionSupported, setRecognitionSupported] = useState(false);
-  const recognition = useRef<SpeechRecognition | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorder = useRef<MediaRecorder | null>(null);
+  const audioChunks = useRef<Blob[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if Speech Recognition is supported
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      setRecognitionSupported(true);
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition.current = new SpeechRecognition();
-      
-      if (recognition.current) {
-        recognition.current.continuous = true;
-        recognition.current.interimResults = true;
-        recognition.current.lang = 'en-US';
-
-        recognition.current.onstart = () => {
-          setIsListening(true);
-          toast({
-            title: "Voice Assistant Active",
-            description: "Listening for your command...",
-          });
-        };
-
-        recognition.current.onend = () => {
-          setIsListening(false);
-        };
-
-        recognition.current.onresult = (event) => {
-          let finalTranscript = '';
-          let interimTranscript = '';
-
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcriptResult = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-              finalTranscript += transcriptResult;
-            } else {
-              interimTranscript += transcriptResult;
-            }
-          }
-
-          setTranscript(finalTranscript || interimTranscript);
-          
-          if (finalTranscript && onTranscript) {
-            onTranscript(finalTranscript);
-            processVoiceCommand(finalTranscript);
+    // Initialize media recorder for better audio capture
+    const initializeMediaRecorder = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder.current = new MediaRecorder(stream);
+        
+        mediaRecorder.current.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunks.current.push(event.data);
           }
         };
 
-        recognition.current.onerror = (event) => {
-          console.error('Speech recognition error:', event.error);
-          setIsListening(false);
-          toast({
-            title: "Voice Recognition Error",
-            description: "Please try again or check your microphone settings.",
-            variant: "destructive",
-          });
+        mediaRecorder.current.onstop = async () => {
+          const audioBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
+          audioChunks.current = [];
+          await processAudioBlob(audioBlob);
         };
+      } catch (error) {
+        console.error('Error accessing microphone:', error);
+        toast({
+          title: "Microphone Access",
+          description: "Please allow microphone access for voice features.",
+          variant: "destructive",
+        });
       }
-    }
-  }, [onTranscript, toast]);
+    };
 
-  const processVoiceCommand = async (text: string) => {
+    initializeMediaRecorder();
+  }, []);
+
+  const processAudioBlob = async (audioBlob: Blob) => {
     setIsProcessing(true);
     
-    // Simple command processing (in a real app, this would connect to Omnidim.io)
+    try {
+      // Convert audio blob to base64
+      const arrayBuffer = await audioBlob.arrayBuffer();
+      const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+      
+      // Send to Supabase edge function for transcription
+      const { data, error } = await supabase.functions.invoke('voice-to-text', {
+        body: { audio: base64Audio }
+      });
+
+      if (error) throw error;
+
+      const transcribedText = data.text;
+      setTranscript(transcribedText);
+      
+      if (onTranscript) {
+        onTranscript(transcribedText);
+      }
+      
+      await processVoiceCommand(transcribedText);
+      
+    } catch (error) {
+      console.error('Voice processing error:', error);
+      toast({
+        title: "Voice Processing Error",
+        description: "Failed to process voice command. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const processVoiceCommand = async (text: string) => {
     const command = text.toLowerCase();
     
     if (command.includes('ticket') && command.includes('status')) {
@@ -97,47 +105,57 @@ export const VoiceInterface: React.FC<VoiceInterfaceProps> = ({
     } else if (command.includes('feedback')) {
       onCommand?.('collect_feedback', { feedback: text });
     }
-    
-    setTimeout(() => setIsProcessing(false), 1000);
   };
 
-  const toggleListening = () => {
-    if (!recognition.current) return;
+  const toggleRecording = () => {
+    if (!mediaRecorder.current) {
+      toast({
+        title: "Microphone Unavailable",
+        description: "Please allow microphone access to use voice features.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    if (isListening) {
-      recognition.current.stop();
+    if (isRecording) {
+      mediaRecorder.current.stop();
+      setIsRecording(false);
+      setIsListening(false);
     } else {
-      recognition.current.start();
+      audioChunks.current = [];
+      mediaRecorder.current.start();
+      setIsRecording(true);
+      setIsListening(true);
+      
+      toast({
+        title: "Voice Recording",
+        description: "Recording your voice command...",
+      });
     }
   };
 
-  const speak = (text: string) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.8;
-      utterance.pitch = 1;
-      speechSynthesis.speak(utterance);
+  const speak = async (text: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('text-to-voice', {
+        body: { text, voice: 'alloy' }
+      });
+
+      if (error) throw error;
+
+      // Play the audio
+      const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
+      audio.play();
+    } catch (error) {
+      console.error('Text-to-speech error:', error);
+      // Fallback to browser speech synthesis
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.8;
+        utterance.pitch = 1;
+        speechSynthesis.speak(utterance);
+      }
     }
   };
-
-  if (!recognitionSupported) {
-    return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MicOff className="h-5 w-5 text-muted-foreground" />
-            Voice Assistant Unavailable
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Voice recognition is not supported in this browser. For full voice functionality, 
-            please integrate with Omnidim.io backend service.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card className="w-full">
@@ -157,21 +175,21 @@ export const VoiceInterface: React.FC<VoiceInterfaceProps> = ({
           <Button
             variant={isListening ? "voiceActive" : "voice"}
             size="lg"
-            onClick={toggleListening}
+            onClick={toggleRecording}
             disabled={isProcessing}
             className="w-24 h-24 rounded-full"
           >
             {isProcessing ? (
               <Loader2 className="h-8 w-8 animate-spin" />
             ) : isListening ? (
-              <Mic className="h-8 w-8" />
+              <Mic className="h-8 w-8 animate-pulse" />
             ) : (
               <MicOff className="h-8 w-8" />
             )}
           </Button>
           
           <p className="text-sm text-muted-foreground text-center">
-            {isListening ? "Listening... Speak now" : "Click to start voice command"}
+            {isProcessing ? "Processing..." : isListening ? "Recording... Click to stop" : "Click to start voice command"}
           </p>
         </div>
 
