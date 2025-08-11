@@ -80,13 +80,74 @@ export const VoiceInterface: React.FC<VoiceInterfaceProps> = ({
       
     } catch (error) {
       console.error('Voice processing error:', error);
-      toast({
-        title: "Voice Processing Error",
-        description: "Failed to process voice command. Please try again.",
-        variant: "destructive",
-      });
+      const message = (error as any)?.message || '';
+      if (typeof message === 'string' && message.toLowerCase().includes('quota')) {
+        toast({
+          title: "Transcription unavailable",
+          description: "Falling back to on-device speech recognition.",
+        });
+        startBrowserRecognition();
+      } else {
+        toast({
+          title: "Voice Processing Error",
+          description: "Failed to process voice command. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const startBrowserRecognition = () => {
+    try {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        toast({
+          title: "Voice unavailable",
+          description: "Browser speech recognition is not supported.",
+          variant: "destructive",
+        });
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = (event: any) => {
+        const text = event?.results?.[0]?.[0]?.transcript || '';
+        setTranscript(text);
+        onTranscript?.(text);
+        processVoiceCommand(text);
+        setIsRecording(false);
+        setIsListening(false);
+      };
+
+      recognition.onerror = (e: any) => {
+        console.error('Browser STT error:', e);
+        toast({
+          title: "Voice Processing Error",
+          description: "Speech recognition failed. Please try again.",
+          variant: "destructive",
+        });
+        setIsRecording(false);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsRecording(false);
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch (e) {
+      console.error('SpeechRecognition init error:', e);
+      toast({
+        title: "Voice Error",
+        description: "Could not start speech recognition.",
+        variant: "destructive",
+      });
     }
   };
 

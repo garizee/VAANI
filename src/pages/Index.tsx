@@ -172,18 +172,22 @@ const Index = () => {
   ];
 
   const handleVoiceCommand = (command, data) => {
-    const event = new CustomEvent('voiceCommand', { detail: { command, data } });
-    window.dispatchEvent(event);
-    
     setIsVoiceActive(true);
-    
+
+    const dispatchEventNow = () => {
+      const evt = new CustomEvent('voiceCommand', { detail: { command, data } });
+      window.dispatchEvent(evt);
+    };
+
     if (command === 'suggest_events') {
+      dispatchEventNow();
       toast({
         title: "Event Suggestions",
         description: "Check the Events tab for personalized recommendations!",
       });
       setCurrentView('events');
     } else if (command === 'collect_feedback') {
+      dispatchEventNow();
       toast({
         title: "Feedback Collected",
         description: "Your feedback has been recorded. Thank you!",
@@ -195,12 +199,20 @@ const Index = () => {
         description: "Opening ticket management for you...",
       });
       setCurrentView('tickets');
+      setTimeout(() => {
+        dispatchEventNow();
+      }, 250);
     } else if (command === 'check_ticket_status') {
       toast({
         title: "Checking Ticket Status",
         description: `Looking up ticket #${data?.ticketId || 'Unknown'}`,
       });
       setCurrentView('tickets');
+      setTimeout(() => {
+        dispatchEventNow();
+      }, 250);
+    } else {
+      dispatchEventNow();
     }
     
     // Auto-disable voice after command
