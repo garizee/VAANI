@@ -180,6 +180,17 @@ export const EventRecommendations: React.FC<EventRecommendationsProps> = ({
     return icons[category];
   };
 
+  const getSuggestedTime = (category: CommunityEvent['category']) => {
+    switch (category) {
+      case 'Wellness': return '6:00 PM';
+      case 'Entertainment': return '8:00 PM';
+      case 'Social': return '7:00 PM';
+      case 'Educational': return '2:00 PM';
+      case 'Maintenance': return '7:00 PM';
+      default: return '6:00 PM';
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -196,58 +207,77 @@ export const EventRecommendations: React.FC<EventRecommendationsProps> = ({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {recommendedEvents.map((event) => {
-              const CategoryIcon = getCategoryIcon(event.category);
-              
-              return (
-                <Card key={event.id} className="relative">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <h4 className="font-medium">{event.title}</h4>
-                        <Badge variant={getCategoryColor(event.category)}>
-                          <CategoryIcon className="h-3 w-3 mr-1" />
-                          {event.category}
-                        </Badge>
-                      </div>
-                      <Button
-                        size="sm"
-                        onClick={() => handleSelectEvent(event)}
-                        className="ml-2"
-                      >
-                        Select
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <p className="text-sm text-muted-foreground">{event.description}</p>
-                    
-                    <div className="space-y-2 text-xs">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-3 w-3" />
-                        <span>{event.suggestedDate.toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-3 w-3" />
-                        <span>{event.location}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Users className="h-3 w-3" />
-                        <span>~{event.estimatedAttendees} expected</span>
-                      </div>
-                    </div>
+          {/* Upcoming Soon */}
+          {(() => {
+            const sorted = [...recommendedEvents].sort((a, b) => a.suggestedDate.getTime() - b.suggestedDate.getTime());
+            const now = new Date();
+            const daysDiff = (d: Date) => (d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+            const soonEvents = sorted.filter(e => daysDiff(e.suggestedDate) <= 10);
+            const laterEvents = sorted.filter(e => daysDiff(e.suggestedDate) > 10);
 
-                    <div className="pt-2 border-t">
-                      <p className="text-xs text-muted-foreground">
-                        <strong>Why recommended:</strong> {event.reason}
-                      </p>
+            return (
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-semibold mb-3">Upcoming Soon</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {soonEvents.map((event) => {
+                      const CategoryIcon = getCategoryIcon(event.category);
+                      return (
+                        <Card key={event.id} className="relative">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between">
+                              <div className="space-y-1">
+                                <h4 className="font-medium">{event.title}</h4>
+                                <Badge variant={getCategoryColor(event.category)}>
+                                  <CategoryIcon className="h-3 w-3 mr-1" />
+                                  {event.category}
+                                </Badge>
+                              </div>
+                              <Button size="sm" onClick={() => handleSelectEvent(event)} className="ml-2">Select</Button>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            <p className="text-sm text-muted-foreground">{event.description}</p>
+                            <div className="space-y-2 text-xs">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-3 w-3" />
+                                <span>{event.suggestedDate.toLocaleDateString()} • {getSuggestedTime(event.category)}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <MapPin className="h-3 w-3" />
+                                <span>{event.location}</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Later This Month */}
+                {laterEvents.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-3">Later This Month</h4>
+                    <div className="space-y-3">
+                      {laterEvents.map((event) => (
+                        <div key={event.id} className="p-4 border rounded-lg flex items-start justify-between">
+                          <div>
+                            <div className="font-medium">{event.title}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {event.reason || event.description}
+                            </div>
+                          </div>
+                          <Badge variant={getCategoryColor(event.category)}>{event.category}</Badge>
+                        </div>
+                      ))}
                     </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
         </CardContent>
       </Card>
 

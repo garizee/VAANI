@@ -170,31 +170,42 @@ export const TicketManagement: React.FC<TicketManagementProps> = ({
   };
 
   const handleVoiceTicketCreation = (description: string) => {
-    // Process voice input for ticket creation
-    let voiceTicket = {
-      title: description.substring(0, 50) + "...",
+    const meta: any = (user as any)?.user_metadata || {};
+    const displayName = meta.display_name || user?.email || 'Resident';
+    const apartment = meta.apartment_number || meta.apartment || '';
+    const voiceLocation = apartment ? `Apartment ${apartment}` : 'Unknown location';
+
+    const short = description.trim().slice(0, 60);
+    const lower = description.toLowerCase();
+
+    // Determine priority based on seriousness
+    const criticalKeywords = ['emergency','fire','smoke','gas leak','flood','injury','medical','break-in','security threat','electric shock'];
+    const highKeywords = ['ac','air conditioning','heating','elevator','water leak','power outage','no power','lift','plumbing','leak'];
+    const isCritical = criticalKeywords.some(k => lower.includes(k));
+    const isHigh = highKeywords.some(k => lower.includes(k));
+    let priority: 'P1' | 'P2' | 'P3' | 'P4' = isCritical ? 'P1' : isHigh ? 'P2' : 'P3';
+
+    // Determine category
+    let category: string = 'Maintenance';
+    if (['noise','neighbor','music','loud'].some(k => lower.includes(k))) category = 'Noise Complaint';
+    else if (['security','theft','intruder','break-in'].some(k => lower.includes(k))) category = 'Security';
+
+    const voiceTicket: Omit<Ticket, 'id' | 'createdAt'> = {
+      title: `Issue from ${displayName}${apartment ? ` (Apt ${apartment})` : ''}: ${short}${description.length > 60 ? '...' : ''}`,
       description,
-      priority: 'P3' as 'P1' | 'P2' | 'P3' | 'P4',
-      status: 'Open' as 'Open' | 'Assigned' | 'In Progress' | 'Resolved',
-      category: 'Voice Complaint',
-      location: 'To be determined',
-      assignedTo: ''
+      priority,
+      status: 'Open',
+      category,
+      location: voiceLocation,
+      assignedTo: '',
+      image_url: ''
     };
 
-    // Auto-assign priority and category based on voice input
-    const lowerDesc = description.toLowerCase();
-    if (lowerDesc.includes('emergency') || lowerDesc.includes('urgent')) {
-      voiceTicket.priority = 'P1';
-    } else if (lowerDesc.includes('AC') || lowerDesc.includes('air conditioning') || 
-               lowerDesc.includes('heating') || lowerDesc.includes('elevator')) {
-      voiceTicket.priority = 'P2';
-    }
-
-    if (lowerDesc.includes('maintenance')) voiceTicket.category = 'Maintenance';
-    else if (lowerDesc.includes('noise') || lowerDesc.includes('neighbor')) voiceTicket.category = 'Noise Complaint';
-    else if (lowerDesc.includes('security')) voiceTicket.category = 'Security';
-
     onCreateTicket(voiceTicket);
+    toast({
+      title: 'Ticket Created via Voice',
+      description: 'Your complaint has been recorded.',
+    });
   };
 
   const findTicketById = (ticketId: string) => {
