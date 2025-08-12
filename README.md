@@ -1,26 +1,33 @@
-# Welcome to your Lovable project
+# This is Our AI assissted virtual community hub - VAANI
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/e9469e5f-c3b3-4e0c-a5b9-6f05ef32ed7c
+Build a voice-enabled Virtual Community Manager that serves two primary functions: Support Management (allow residents to raise complaints or service requests and track their resolution using natural speech) and Community Engagement Assistant (recommend potential events to the community manager, assist in promoting selected events, and gather feedback and analytics post-event).
 
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/e9469e5f-c3b3-4e0c-a5b9-6f05ef32ed7c) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Key Features
+•
+Voice Input via Omnidim.io: Residents log complaints through the Voice AI Assistant including details like issue type, location (room/floor), and a brief description.
+•
+Automated Ticket Creation: System converts voice input into structured ticket format, assigns predefined priority levels (P1–P4) based on keywords and issue types, and allocates tickets to available technicians based on specialization and availability.
+•
+Ticket Tracking: When residents provide ticket numbers, the assistant responds with current status (Assigned, In Progress, Resolved). Allows status checks using voice commands like "What's the update on ticket 2035?"
+•
+Event Suggestions to Community Managers: The system suggests event ideas based on past successful events, facilities available at the property (e.g., terrace, lounge, garden), and calendar context (e.g., weekends, festivals).
+•
+Event Promotion Assistance: Helps create and broadcast event announcement messages (text or voice-based) for community platforms like WhatsApp, bulletin boards, and internal apps.
+•
+Feedback Collection & Analytics: Post-event, the assistant collects resident feedback via voice, short surveys, or ratings and generates basic analytics such as attendance count, positive/negative feedback trends, and engagement scores.
+Deliverables
+•
+Working Voice Interface (Using Omnidim.io): Residents can log complaints via voice and provide ticket numbers to get status updates through voice commands.
+•
+Complaint Management Backend: Ticket generation based on voice input, priority tagging (P1–P4) based on predefined keyword mapping, and technician/staff assignment (mocked or basic logic is acceptable).
+•
+Event Recommendation Module: Suggest events dynamically based on internal calendar, available infrastructure (you may mock this input), and past events stored in a mock dataset.
+•
+Promotion Assistance: Generate sample text announcements and/or voice-friendly promotion scripts for at least 2 recommended events.
+•
+Feedback & Analytics Dashboard: Collect and store feedback (ratings, voice responses, text) and display basic analytics including participation estimates (mock input acceptable), feedback distribution, and event popularity ranking.
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
